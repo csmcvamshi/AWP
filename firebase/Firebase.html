@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    
+</head>
+
+<body>
+    <h2>Student Management System</h2>
+    Enter Student Name: <input type="text" name="name" id="name"><br><br>
+    Enter Student Roll Number: <input type="text" name="roll" id="roll"><br><br>
+    Enter Student Branch: <input type="text" name="branch" id="br"><br><br>
+    Enter Student Year: <input type="text" name="year" id="yr"><br><br>
+    Enter Student CGPA: <input type="text" name="cgpa" id="cg"><br><br>
+    <input type="button" name="insert" value="INSERT" id="b1">
+    <input type="button" name="delete" value="DELETE" id="b2">
+    <input type="button" name="update" value="UPDATE" id="b3">
+    <input type="button" name="display" value="DISPLAY" id="b4">
+    <h2 id="d"></h2>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, set, remove, update, get, child } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCf4puXcbCG2K6TsI8qbhUas8ZraddR56g",
+            authDomain: "studentmanagementsystem-705ac.firebaseapp.com",
+            databaseURL: "https://studentmanagementsystem-705ac-default-rtdb.firebaseio.com",
+            projectId: "studentmanagementsystem-705ac",
+            storageBucket: "studentmanagementsystem-705ac.appspot.com",
+            messagingSenderId: "8368923025",
+            appId: "1:8368923025:web:b0dd16000e58306cf6fa30",
+            measurementId: "G-T40XKFJPE9"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Event listeners for buttons
+        document.getElementById("b1").addEventListener("click", insertData);
+        document.getElementById("b2").addEventListener("click", deleteData);
+        document.getElementById("b3").addEventListener("click", updateData);
+        document.getElementById("b4").addEventListener("click", displayData);
+
+        // Insert Data
+        function insertData() {
+            const n = document.getElementById("name").value;
+            const r = document.getElementById("roll").value;
+            const b = document.getElementById("br").value;
+            const y = document.getElementById("yr").value;
+            const c = document.getElementById("cg").value;
+
+            if (n === "" || r === "" || b === "" || y === "" || c === "") {
+                alert("Please fill all fields!");
+                return;
+            }
+
+            const studentData = {
+                name: n,
+                branch: b,
+                year: y,
+                cgpa: c
+            };
+
+            set(ref(db, "Student/" + r), studentData)
+                .then(() => alert("Student Data Inserted Successfully"))
+                .catch((error) => alert("Error: " + error));
+        }
+
+        // Delete Data
+        function deleteData() {
+            const r = document.getElementById("roll").value;
+            if (r === "") {
+                alert("Please enter roll number");
+                return;
+            }
+
+            remove(ref(db, "Student/" + r))
+                .then(() => alert("Student Data deleted successfully"))
+                .catch((error) => alert("Error: " + error));
+        }
+
+        // Update Data
+        function updateData() {
+            const n = document.getElementById("name").value;
+            const r = document.getElementById("roll").value;
+            const b = document.getElementById("br").value;
+            const y = document.getElementById("yr").value;
+            const c = document.getElementById("cg").value;
+
+            if (r === "") {
+                alert("Please enter roll number");
+                return;
+            }
+
+            const studentData = {
+                name: n,
+                branch: b,
+                year: y,
+                cgpa: c
+            };
+
+            update(ref(db, "Student/" + r), studentData)
+                .then(() => alert("Student Data Updated Successfully"))
+                .catch((error) => alert("Error: " + error));
+        }
+
+        // Display Data
+        function displayData() {
+            const r = document.getElementById("roll").value;
+            if (r === "") {
+                alert("Please enter roll number");
+                return;
+            }
+
+            get(child(ref(db), "Student/" + r)).then(function (snapshot) {
+                if (snapshot.exists()) {
+                    const student = snapshot.val();
+                    document.getElementById("d").innerHTML =
+                        `<table style="border-collapse:collapse">
+                            <tr>
+                                <th>Name</th>
+                                <th>roll</th>
+                                <th>Branch</th>
+                                <th>Year</th>
+                                <th>CGPA</th>
+                            </tr>
+                            <tr>
+                                <td>${student.name}</td>
+                                <td>${roll.value}</td>
+                                <td>${student.branch}</td>
+                                <td>${student.year}</td>
+                                <td>${student.cgpa}</td>
+                            </tr>
+                        </table>`
+                } else {
+                    alert("No data available for this roll number.");
+                }
+            }).catch((error) => alert("Error: " + error));
+        }
+    </script>
+</body>
+
+</html>
